@@ -1,0 +1,361 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Lloyd_Max</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-01-15"><meta name="DC.source" content="Lloyd_Max.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">O algorithmos Lloyd Max</a></li></ul></div><pre class="codeinput"><span class="comment">% PCM me mi omoimorfo kvantisti</span>
+<span class="keyword">function</span> [xq,centers,D] = Lloyd_Max(x,N,min_value,max_value)
+<span class="comment">%x to sima eisodou upo morfh dianismanos</span>
+<span class="comment">%N o arithmos twn bits pou tha xrisimopoihthoun</span>
+<span class="comment">%max_value h megisti apodekti timi tou simatos eisodou</span>
+<span class="comment">%min_value h elaxisti apodekti timi tou simatos eisodou</span>
+
+
+
+<span class="comment">%xq to kwdikopoihmeno dianusma exodou meta apo Kmax epanalipseis</span>
+<span class="comment">%centers ta kentra twn perioxwn kvantisis meta apo Kmax epanalipseis</span>
+<span class="comment">%D dianusma pou periexei tis times [D1:DkmAX] opou Di antstoixei sthn mesh paramorgwsh sthn i-osth epanalhpsh tou algorithmou</span>
+
+
+
+<span class="comment">% mhkos tou dianusmatos x</span>
+l = length(x) ;
+
+count = 1;
+
+<span class="comment">% Arxikopoihsh  twn oriwn kvantismou me ta kentra tou omoiomorfou kvantisti</span>
+[xq_tmp,centers_tmp] = my_quantizer(x,N,min(x),max_value) ;
+
+<span class="comment">% Ypologismos elaxistis timis simatos eisodou</span>
+<span class="comment">%upologismos megistis timis simatos eisodou</span>
+min_value = min(x);
+
+
+<span class="comment">% Arxikopoihsh dianusmatwn</span>
+ s = zeros(1,2^N) ;
+ n=zeros(1,2^N) ;
+ upper = zeros(1,2^N) ;
+ lower = zeros(1,2^N) ;
+
+ <span class="comment">% Ypologismos isxus tous simatos eisodou x</span>
+ power = mean(x.^2);
+
+ <span class="comment">% Megisto kai elaxisto orio tou simatos eisodou</span>
+
+<span class="keyword">for</span> i = 1:l
+  <span class="keyword">if</span> x(i)&gt; max_value
+      x(i) = max_value ;
+  <span class="keyword">elseif</span> x(i) &lt; min_value
+     x(i) =min_value ;
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+ loop = 0;
+ <span class="keyword">while</span> loop~=1
+
+<span class="keyword">for</span> k = 1: 2^N
+</pre><pre class="codeinput">    <span class="comment">%elegxoume se poia perioxi tou sima eimaste wste na vroume tin megisti kai elaxisti timi tou simatos</span>
+    <span class="comment">%An eimaste stin prwth tote to anw orio einai to max_value tou simatos</span>
+     <span class="keyword">if</span> k == 1
+        upper(k) = max_value ;
+        lower(k) = (centers_tmp(k) + centers_tmp(k+1) )/2 ;
+    <span class="comment">%An eimaste stin teleutaia tote to katw orio einai to min_value tou simatos</span>
+     <span class="keyword">elseif</span> k==2^N
+         upper(k) = (centers_tmp(k-1) + centers_tmp(k) )/2 ;
+         lower(k) = min_value ;
+    <span class="comment">%Stis upoloipes periptwseis vriskoume to orio upologizontas me thn vohtheia twn duo geitonikwn perioxwn</span>
+     <span class="keyword">else</span>
+         upper(k) = (centers_tmp(k-1) + centers_tmp(k) )/2 ;
+         lower(k) = (centers_tmp(k) + centers_tmp(k+1) )/2 ;
+     <span class="keyword">end</span>
+</pre><h2>O algorithmos Lloyd Max<a name="3"></a></h2><pre class="codeinput">    <span class="keyword">for</span> i = 1:l
+
+       <span class="keyword">if</span> x(i) &gt;= lower(k) &amp;&amp;  x(i) &lt;=upper(k)
+<span class="comment">%upologizoume tin timi tou simatos exodou upologizontas to kvantismeno sima eisodou</span>
+
+
+               xq_tmp(i) = k ;
+ <span class="comment">% Voithitika dianusmata gia ton upologismo tou</span>
+ <span class="comment">% mesou orou twn timwn eisodou se kathe perioxi</span>
+              s(k) = s(k) + x(i) ;
+              n(k) = n(k)+1 ;
+       <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+ <span class="comment">% Ean uparxei toulaxiston mia timi mesa stin perioxi</span>
+ <span class="comment">% ypologizoume to neo kentroeides ws ton meso oro</span>
+ <span class="comment">% aftwn twn timwn</span>
+
+    <span class="keyword">if</span> n(k) ~= 0
+        centers_tmp(k) = s(k)/n(k) ;
+    <span class="keyword">else</span>
+ <span class="comment">% alliws to kentroeides paramenei opws itan</span>
+        centers_tmp(k) = (upper(k)+lower(k)) /2 ;
+
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+<span class="comment">% Ypologismos kvantismenou simatos</span>
+ x_new = centers_tmp(xq_tmp);
+
+ <span class="comment">% Ypologismos paramorfwsis gia kathe epanalipsi tou algorithmou</span>
+ Dis(count)= mean((x-x_new').^2) ;
+ <span class="comment">% Ypologismos thoruvou tou kvantismenou simatos</span>
+ noise = mean((x-x_new').^2);
+
+ <span class="comment">% Ypologismos SQNR gia kathe epanalipsi tou algorithmou</span>
+ SQNR(count) = power/noise;
+  <span class="comment">% Ypologismos SQNR se db</span>
+ SQNRdb(count) = 10*log10(SQNR(count));
+
+ <span class="comment">% Ean den vriskomaste stin prwti epanalipsi</span>
+ <span class="comment">% kai h diafora tis paramorfwshs tou neou kvantismenou simatos</span>
+ <span class="comment">% apo to to kvantismeno sima tis proigoumenis epanalipsis</span>
+ <span class="comment">% einai mikroteri tou katwfliou 10^-7 termatizei o algorithmos</span>
+ <span class="keyword">if</span> count ~= 1 &amp;&amp; Dis(count-1)-Dis(count) &lt;10^-7
+     loop =1;
+ <span class="keyword">end</span>
+
+  count = count +1 ;
+ <span class="keyword">end</span>
+
+<span class="comment">% Ta dianusmata eksodou pairnoun tis times twn dianusmatwn stin</span>
+<span class="comment">% teleftaia epanalipsi tou algorithmou</span>
+xq = xq_tmp ;
+centers = centers_tmp ;
+
+<span class="comment">% Ypologismos paramorfwsis stin teleftaia epanalipsi</span>
+D = Dis(length(Dis)) ;
+
+<span class="comment">% Grafikh parastash SQNR (db) gia oles tis epanalipseis</span>
+figure(N)
+plot(SQNRdb,<span class="string">'-b'</span>,<span class="string">'LineWidth'</span>,2);
+title([<span class="string">'Arithmos bits kvantisis = '</span>,num2str(N),<span class="string">' bits'</span>])
+ylabel(<span class="string">'SQNR_d_b'</span>)
+xlabel(<span class="string">'epanalipseis'</span>)
+grid <span class="string">on</span>
+
+xq1=centers(xq);
+figure(N+1)
+plot(xq1,<span class="string">'-b'</span>,<span class="string">'LineWidth'</span>,2);
+title([<span class="string">'Arithmos bits kvantisis = '</span>,num2str(N),<span class="string">' bits'</span>])
+ylabel(<span class="string">'SQNR_d_b'</span>)
+xlabel(<span class="string">'epanalipseis'</span>)
+grid <span class="string">on</span>
+
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Error using Lloyd_Max (line 17)
+Not enough input arguments.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% PCM me mi omoimorfo kvantisti
+function [xq,centers,D] = Lloyd_Max(x,N,min_value,max_value)
+%x to sima eisodou upo morfh dianismanos
+%N o arithmos twn bits pou tha xrisimopoihthoun
+%max_value h megisti apodekti timi tou simatos eisodou
+%min_value h elaxisti apodekti timi tou simatos eisodou
+
+
+
+%xq to kwdikopoihmeno dianusma exodou meta apo Kmax epanalipseis
+%centers ta kentra twn perioxwn kvantisis meta apo Kmax epanalipseis
+%D dianusma pou periexei tis times [D1:DkmAX] opou Di antstoixei sthn mesh paramorgwsh sthn i-osth epanalhpsh tou algorithmou
+
+
+
+% mhkos tou dianusmatos x
+l = length(x) ;
+
+count = 1;
+
+% Arxikopoihsh  twn oriwn kvantismou me ta kentra tou omoiomorfou kvantisti 
+[xq_tmp,centers_tmp] = my_quantizer(x,N,min(x),max_value) ;
+
+% Ypologismos elaxistis timis simatos eisodou
+%upologismos megistis timis simatos eisodou
+min_value = min(x);
+
+
+% Arxikopoihsh dianusmatwn
+ s = zeros(1,2^N) ;
+ n=zeros(1,2^N) ;
+ upper = zeros(1,2^N) ;
+ lower = zeros(1,2^N) ;
+ 
+ % Ypologismos isxus tous simatos eisodou x
+ power = mean(x.^2);
+
+ % Megisto kai elaxisto orio tou simatos eisodou
+ 
+for i = 1:l
+  if x(i)> max_value
+      x(i) = max_value ;
+  elseif x(i) < min_value
+     x(i) =min_value ;
+  end
+end
+
+ loop = 0;
+ while loop~=1
+    
+for k = 1: 2^N
+    %elegxoume se poia perioxi tou sima eimaste wste na vroume tin megisti kai elaxisti timi tou simatos
+    %An eimaste stin prwth tote to anw orio einai to max_value tou simatos
+     if k == 1 
+        upper(k) = max_value ;
+        lower(k) = (centers_tmp(k) + centers_tmp(k+1) )/2 ;
+    %An eimaste stin teleutaia tote to katw orio einai to min_value tou simatos
+     elseif k==2^N
+         upper(k) = (centers_tmp(k-1) + centers_tmp(k) )/2 ;
+         lower(k) = min_value ;
+    %Stis upoloipes periptwseis vriskoume to orio upologizontas me thn vohtheia twn duo geitonikwn perioxwn
+     else
+         upper(k) = (centers_tmp(k-1) + centers_tmp(k) )/2 ;
+         lower(k) = (centers_tmp(k) + centers_tmp(k+1) )/2 ;
+     end
+    
+  
+ %% O algorithmos Lloyd Max
+    for i = 1:l
+        
+       if x(i) >= lower(k) &&  x(i) <=upper(k) 
+%upologizoume tin timi tou simatos exodou upologizontas to kvantismeno sima eisodou
+
+
+               xq_tmp(i) = k ;
+ % Voithitika dianusmata gia ton upologismo tou
+ % mesou orou twn timwn eisodou se kathe perioxi
+              s(k) = s(k) + x(i) ;
+              n(k) = n(k)+1 ;
+       end
+       
+    end
+ 
+ % Ean uparxei toulaxiston mia timi mesa stin perioxi
+ % ypologizoume to neo kentroeides ws ton meso oro
+ % aftwn twn timwn
+ 
+    if n(k) ~= 0
+        centers_tmp(k) = s(k)/n(k) ;
+    else 
+ % alliws to kentroeides paramenei opws itan
+        centers_tmp(k) = (upper(k)+lower(k)) /2 ;
+        
+    end
+    
+end
+% Ypologismos kvantismenou simatos
+ x_new = centers_tmp(xq_tmp);
+
+ % Ypologismos paramorfwsis gia kathe epanalipsi tou algorithmou
+ Dis(count)= mean((x-x_new').^2) ;
+ % Ypologismos thoruvou tou kvantismenou simatos
+ noise = mean((x-x_new').^2);
+ 
+ % Ypologismos SQNR gia kathe epanalipsi tou algorithmou
+ SQNR(count) = power/noise;
+  % Ypologismos SQNR se db
+ SQNRdb(count) = 10*log10(SQNR(count));
+
+ % Ean den vriskomaste stin prwti epanalipsi
+ % kai h diafora tis paramorfwshs tou neou kvantismenou simatos
+ % apo to to kvantismeno sima tis proigoumenis epanalipsis
+ % einai mikroteri tou katwfliou 10^-7 termatizei o algorithmos
+ if count ~= 1 && Dis(count-1)-Dis(count) <10^-7
+     loop =1;
+ end
+ 
+  count = count +1 ;
+ end
+
+% Ta dianusmata eksodou pairnoun tis times twn dianusmatwn stin 
+% teleftaia epanalipsi tou algorithmou
+xq = xq_tmp ;
+centers = centers_tmp ;
+
+% Ypologismos paramorfwsis stin teleftaia epanalipsi
+D = Dis(length(Dis)) ;
+
+% Grafikh parastash SQNR (db) gia oles tis epanalipseis
+figure(N)
+plot(SQNRdb,'-b','LineWidth',2);
+title(['Arithmos bits kvantisis = ',num2str(N),' bits'])
+ylabel('SQNR_d_b')
+xlabel('epanalipseis')
+grid on
+
+xq1=centers(xq);
+figure(N+1)
+plot(xq1,'-b','LineWidth',2);
+title(['Arithmos bits kvantisis = ',num2str(N),' bits'])
+ylabel('SQNR_d_b')
+xlabel('epanalipseis')
+grid on
+
+
+end
+##### SOURCE END #####
+--></body></html>
